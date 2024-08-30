@@ -9,7 +9,7 @@ context('Exercicio - Testes End-to-end - Fluxo de pedido', () => {
       Adicionando ao carrinho
       Preenchendo todas opções no checkout
       E validando minha compra ao final */
-
+})
   beforeEach(() => {
       cy.visit('http://lojaebac.ebaconline.art.br')
   });
@@ -19,16 +19,25 @@ context('Exercicio - Testes End-to-end - Fluxo de pedido', () => {
       
         cy.fixture('produtos').then (dados => {
 
-
             produtosPage.visitarProduto(dados [0].nomeProduto)
             produtosPage.addProdutoCarrinho(
                 dados[0].tamanho,
                 dados[0].cor, 
-                dados[0].quantidade)
+                dados[0].quantidade)        
+        });
 
-            cy.get('.woocommerce-message').should('contain', dados[0].nomeProduto)})
+        cy.get('.woocommerce-message > .button').click()
+        cy.get('.checkout-button').click()
+        cy.get('.showlogin').click()
 
-  });
+        cy.fixture('perfil').then (dados => {
+            cy.get('#username').type(dados.usuario)
+            cy.get('#password').type(dados.senha, {log: false})
+            cy.get('.woocommerce-button').click()
+        })
 
+        cy.get('#terms').click()
+        cy.get('#place_order').click()
+        cy.get('.woocommerce-notice').should('contain', 'Obrigado. Seu pedido foi recebido.')
 
-})
+    })
